@@ -1,4 +1,5 @@
 local QBCore = exports['qb-core']:GetCoreObject()
+local inventoryType = Config.inventory or "ox"
 local PlayerWorkVans = {}
 local PlayerDeliveryVehicles = {}
 local waypointCoords = vector3(-603.707, 5305.513, 70.331)
@@ -346,13 +347,40 @@ end
 
 -- Item Counter
 function HasPlayerGotLog()
-    local logCount = exports.ox_inventory:Search('count', 'tr_log')
-    return logCount > 0
+    if inventoryType == "ox" then
+        local logCount = exports.ox_inventory:Search('count', 'tr_log')
+        return logCount > 0
+    elseif inventoryType == "qb" then
+        local hasItem = QBCore.Functions.HasItem('tr_log')
+        return hasItem
+    else
+        local logCount = exports.ox_inventory:Search('count', 'tr_log')
+        return logCount > 0
+    end
 end
 
 function HasPlayerGotChoppedLogs()
-    ChoppedLogs = exports.ox_inventory:Search('count', 'tr_choppedlog')
-    return ChoppedLogs > 0
+    if inventoryType == "ox" then
+        ChoppedLogs = exports.ox_inventory:Search('count', 'tr_choppedlog')
+        return ChoppedLogs > 0
+    elseif inventoryType == "qb" then
+        local hasItem = QBCore.Functions.HasItem('tr_choppedlog')
+        if hasItem then
+            local Player = QBCore.Functions.GetPlayerData()
+            for _, item in pairs(Player.items) do
+                if item.name == 'tr_choppedlog' then
+                    ChoppedLogs = item.amount
+                    break
+                end
+            end
+        else
+            ChoppedLogs = 0
+        end
+        return ChoppedLogs > 0
+    else
+        ChoppedLogs = exports.ox_inventory:Search('count', 'tr_choppedlog')
+        return ChoppedLogs > 0
+    end
 end
 
 function StartCarryingLog(playerPed)
@@ -932,5 +960,35 @@ end)
 
 -- Shop
 RegisterNetEvent('tr-lumberjack:client:contractorshop', function()
-    exports.ox_inventory:openInventory("shop", {type = 'contractorshop'})
+    if inventoryType == "ox" then
+        exports.ox_inventory:openInventory("shop", {type = 'contractorshop'})
+    elseif inventoryType == "qb" then
+        TriggerServerEvent("qb-shops:server:OpenShop", "lumberjack", "Lumberjack Supplies")
+    else
+        exports.ox_inventory:openInventory("shop", {type = 'contractorshop'})
+    end
+end)
+
+function InitializeInventoryType()
+    if Config.inventory then
+        if Config.inventory == "ox" or Config.inventory == "qb" then
+            inventoryType = Config.inventory
+            if Config.debug then
+                print("Inventory system set to: " .. inventoryType)
+            end
+        else
+            print("Warning: Invalid inventory type in config. Defaulting to ox_inventory.")
+            inventoryType = "ox"
+        end
+    else
+        inventoryType = "ox"
+        if Config.debug then
+            print("No inventory type specified in config. Defaulting to ox_inventory.")
+        end
+    end
+end
+
+CreateThread(function()
+    Wait(1000)
+    InitializeInventoryType()
 end)

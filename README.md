@@ -15,6 +15,25 @@ Our resource features a built-in delivery system designed to offer players a sea
 
 Additionally, we have introduced a work van equipped with a compact trailer that attaches to the Bison vehicle. This setup provides players with extra storage capacity, allowing them to transport chopped logs from trees and carry a larger quantity of crafting parts. This flexibility enables players to not only sell their materials but also use them for crafting various items, enhancing the overall gameplay experience.
 
+
+
+instructions:
+
+-- Add to your server setup instructions:
+-- For qb-shops integration, add this to qb-shops/config.lua in the Config.Products table:
+
+["lumberjack"] = {
+    [1] = {
+        name = "weapon_battleaxe",
+        price = 750,
+        amount = 50,
+        info = {},
+        type = "item",
+        slot = 1,
+    },
+    -- Add other shop items here
+},
+
 ## Docs 
 - [GitBook](https://trclassic.gitbook.io/trclassic/tr-lumberjack-v2)
 

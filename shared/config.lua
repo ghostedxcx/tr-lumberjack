@@ -2,6 +2,8 @@
 Config = Config or {}
 Config.debug = false
 
+Config.inventory = "ox" -- Options: ox, qb
+
 -- Notification System
 Config.notification = "qbcore"  -- Options: qbcore, ox (If you have more this function can be found cl.lua line 21)
 
